@@ -1,0 +1,38 @@
+{
+    "name": "lettered/support",
+    "description": "lettered support package",
+    "keywords": ["goeasy", "opt", "socket", "auth"],
+    "type": "library",
+    "support": {
+        "issues": "https://github.com/lettered/support/issues",
+        "source": "https://github.com/lettered/support"
+    },
+    "authors": [
+        {
+            "name": "lettered",
+            "email": "me@lettered.cn"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.3",
+        "ext-openssl": "*",
+        "ext-simplexml":"*",
+        "ext-libxml": "*",
+        "ext-json": "*",
+        "ext-bcmath": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lettered\\Support\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lettered\\Support\\Tests\\": "tests"
+        }
+    },
+    "license": "MIT"
+}
