@@ -23,7 +23,12 @@ class Upload
     /**
      * @var string
      */
-    protected $path = '';
+    protected $path = '/';
+
+    /**
+     * @var string
+     */
+    protected $saveName = "";
 
     /**
      * Auth constructor.
@@ -83,6 +88,22 @@ class Upload
     }
 
     /**
+     * 指定存储名
+     *
+     * @author 许祖兴 < zuxing.xu@lettered.cn>
+     * @date 2020/7/2 10:05
+     *
+     * @param $name
+     * @return $this
+     */
+    public function setName($name){
+
+        $this->saveName = $name;
+
+        return $this;
+    }
+
+    /**
      * 获取驱动
      *
      * @author 许祖兴 < zuxing.xu@lettered.cn>
@@ -116,12 +137,12 @@ class Upload
             'size' => $file->getInfo()['size'],
             'driver' => $this->getDriver()
         ]);
-        return true;
+        return $this->getPath() . '/' . $filename;
     }
 
     /**
      * 本地上传
-     *
+     * 待优化
      * @author 许祖兴 < zuxing.xu@lettered.cn>
      * @date 2020/3/20 0:40
      *
@@ -131,7 +152,11 @@ class Upload
     private function local($file)
     {
         // 移动到框架应用根目录/uploads/ 目录下
-        $info = $file->move( 'uploads' . $this->getPath(),'');
+        $info = $file->move(
+            'uploads' . $this->getPath(),
+            $this->saveName != "" ? $this->saveName : md5(time())
+        );
+
         return $info->getSaveName();
     }
 
