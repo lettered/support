@@ -1,28 +1,37 @@
 <?php
+
+
 namespace Lettered\Support;
 
-use Lettered\Support\Exceptions\FailedException;
+
+use Lettered\Exceptions\FailedException;
 use thans\jwt\facade\JWTAuth;
 use think\facade\Session;
+use think\facade\Config;
 
 class Auth
 {
+
     /**
-     * @var mixed
+     * @var array
      */
     protected $auth;
 
     /**
      * @var
      */
-    protected $guard;
+    protected $guard = 'admin';
 
     /**
      * Auth constructor.
+     * @param array $config
      */
-    public function __construct()
+    public function __construct($config = [])
     {
-        $this->auth = config('mni.auth');
+        if (!empty($config)){
+            $this->auth = $config;
+        }else
+            $this->auth = Config::get('dora.auth');
 
         $this->guard = $this->auth['default']['guard'];
     }
@@ -62,9 +71,6 @@ class Auth
                 'errmsg' => '不存在该用户！'
             ]);
         }
-//        $hashedValue= password_hash($condition['password'],PASSWORD_BCRYPT);
-//        $verify = password_verify($condition['password'], $hashedValue);
-//        halt([$hashedValue, $verify,$user->password,password_verify($condition['password'], $user->password)]);
         // 验证密码
         if (!password_verify($condition['password'], $user->password)) {
             throw new FailedException([
@@ -93,7 +99,14 @@ class Auth
         switch ($this->getDriver()) {
             case 'jwt':
                 $model = app($this->getProvider()['model']);
-                return $model->where($model->getPk(), JWTAuth::auth()[$this->jwtKey()])->find();
+                $user = $model->where($model->getPk(), JWTAuth::auth()[$this->jwtKey()])->find();
+                // 2020/09/20 用户被删除的情况
+                if(!$user){
+                    throw new FailedException([
+                        'errmsg' => 'Unauthorized:Request token denied!'
+                    ]);
+                }
+                return $user;
             case 'session':
                 return Session::get($this->sessionUserKey(), null);
             default:
@@ -134,7 +147,12 @@ class Auth
      */
     protected function jwt($user)
     {
-        $token = JWTAuth::builder([$this->jwtKey() => $user->id]);
+        // 2020/09/20 新增用户唯一校验
+        $uniqueId = base64_encode(Str::enjson(request()->cookie()));
+        // token
+        $token = JWTAuth::builder([$this->jwtKey() => $user->id,'guard' => $this->guard,'unique_id' => $uniqueId]);
+        // 写入唯一ID   门面-标志-用户
+        session($this->guard . '_unique_id_' . $user->id, $uniqueId);
 
         JWTAuth::setToken($token);
 
@@ -249,13 +267,12 @@ class Auth
     {
         $where = [];
 
+        // 这里有待处理
         foreach ($condition as $field => $value) {
             if ($field == 'captcha') continue;
             if ($field != 'password')
-                $where['username|email'] = preg_replace('# #','',$value);
+                $where[$this->auth['field']] = preg_replace('# #','',$value);
         }
-
         return $where;
     }
-
 }
