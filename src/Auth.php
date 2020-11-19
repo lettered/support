@@ -4,7 +4,7 @@
 namespace Lettered\Support;
 
 
-use Lettered\Exceptions\FailedException;
+use Lettered\Support\Exceptions\FailedException;
 use thans\jwt\facade\JWTAuth;
 use think\facade\Session;
 use think\facade\Config;

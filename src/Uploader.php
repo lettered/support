@@ -2,7 +2,7 @@
 
 namespace Lettered\Support;
 
-use Lettered\Exceptions\EvidentException;
+use Lettered\Support\Exceptions\EvidentException;
 use think\File;
 
 class Uploader

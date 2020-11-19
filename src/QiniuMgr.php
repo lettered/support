@@ -3,7 +3,7 @@
 
 namespace Lettered\Support;
 
-use Lettered\Exceptions\EvidentException;
+use Lettered\Support\Exceptions\EvidentException;
 use Qiniu\Auth;
 use Qiniu\Config;
 use Qiniu\Storage\BucketManager;

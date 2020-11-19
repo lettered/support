@@ -3,7 +3,7 @@
 
 namespace Lettered\Support;
 
-use Lettered\Exceptions\FailedException;
+use Lettered\Support\Exceptions\FailedException;
 
 /**
  * //所有接口展示
